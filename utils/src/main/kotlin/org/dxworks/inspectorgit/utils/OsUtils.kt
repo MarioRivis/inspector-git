@@ -7,7 +7,7 @@ class OsUtils {
         val isLinux by lazy { osName.contains("nux", ignoreCase = true) || osName.contains("nix", ignoreCase = true) }
         val isMac by lazy { osName.contains("mac", ignoreCase = true) }
         val isUnix by lazy { isLinux || isMac }
-        val commandInterpreterPrefix by lazy { if (isUnix) "bash" else "cmd.exe" }
+        val commandInterpreterName by lazy { if (isUnix) "bash" else "cmd.exe" }
         val interpreterArg by lazy { if (isUnix) "-c" else "/C" }
     }
 }

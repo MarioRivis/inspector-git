@@ -6,8 +6,8 @@ import java.nio.file.Paths
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
         println("Usage: java -jar git-extractor.jar <config file>")
-        println("The first line of the config file should contain the output folder.")
-        println("The following lines should contain the repositories one on each line")
+        println("The first line of the config file should contain the output folder path.")
+        println("The following lines should contain the repositories paths one on each line")
         return
     }
 
