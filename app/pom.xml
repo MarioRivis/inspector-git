@@ -54,6 +54,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <finalName>inspectorgit</finalName>
                     <mainClass>org.dxworks.inspectorgit.app.InspectorgitApplicationKt</mainClass>
                 </configuration>
             </plugin>

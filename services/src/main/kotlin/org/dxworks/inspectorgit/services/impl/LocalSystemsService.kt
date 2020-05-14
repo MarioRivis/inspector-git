@@ -8,6 +8,7 @@ import org.dxworks.inspectorgit.persistence.entities.LocalSystemEntity
 import org.dxworks.inspectorgit.persistence.repositories.LocalSystemRepository
 import org.dxworks.inspectorgit.services.dto.localProjects.LocalSystemDTO
 import org.dxworks.inspectorgit.utils.appFolderPath
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.io.File
 import java.io.FileNotFoundException
@@ -18,6 +19,10 @@ import javax.transaction.Transactional
 @Service
 class LocalSystemsService(private val loadedSystem: LoadedSystem,
                           private val localSystemRepository: LocalSystemRepository) {
+    companion object {
+        val LOG = LoggerFactory.getLogger(LocalSystemsService::class.java)
+    }
+
     fun create(localSystemDTO: LocalSystemDTO) {
         val systemFolder = getSystemFolder(localSystemDTO.id)
         if (systemFolder.exists())
@@ -26,13 +31,16 @@ class LocalSystemsService(private val loadedSystem: LoadedSystem,
         systemFolder.mkdir()
 
         try {
-
+            LOG.info("Checking files")
             val (repos, iglogs) = localSystemDTO.sources
                     .map { Paths.get(it).toFile() }
                     .onEach { if (!it.exists()) throw FileNotFoundException("${it.absolutePath} is not a file or folder.") }
                     .partition { it.isDirectory }
 
-            repos.forEach { MetadataExtractionManager(it.toPath(), systemFolder.toPath()).extract() }
+            repos.forEach {
+                LOG.info("Extracting iglog from ${it.toPath()}")
+                MetadataExtractionManager(it.toPath(), systemFolder.toPath()).extract()
+            }
 
             val allIglogs = iglogs + (systemFolder.list()?.map { systemFolder.resolve(it) } ?: emptyList<File>())
 
@@ -82,7 +90,9 @@ class LocalSystemsService(private val loadedSystem: LoadedSystem,
 
     private fun transformProjects(allIglogs: List<File>): List<Project> {
         return allIglogs.parallelStream().map {
+            LOG.info("Reading ${it.toPath()}")
             val gitLogDTO = IGLogReader().read(it.inputStream())
+            LOG.info("Transforming ${it.nameWithoutExtension}")
             ProjectTransformer(gitLogDTO, it.nameWithoutExtension).transform()
         }.collect(Collectors.toList())
     }

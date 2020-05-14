@@ -57,7 +57,10 @@ class AnalysisService(private val loadedSystem: LoadedSystem) {
         return ScriptResult(stringWriter.toString(), outputFiles)
     }
 
-    fun getDetails(): LocalSystemDTO =
-            LocalSystemDTO(loadedSystem.id, loadedSystem.name, loadedSystem.projects.keys.toList())
+    fun getDetails(): LocalSystemDTO {
+        if (!loadedSystem.isSet)
+            throw IllegalStateException("No system loaded")
+        return LocalSystemDTO(loadedSystem.id, loadedSystem.name, loadedSystem.projects.keys.toList())
+    }
 
 }
